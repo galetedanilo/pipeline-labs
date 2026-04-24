@@ -38,4 +38,4 @@ jobs:
       - name: Variaveis e Contexto
         run: |
           echo " == Variaveis de Contexo"
-          echo "Variáveis env: ${{ env.NOME_VERSION }}"
+          echo "Variáveis env: ${{ env.NODE_VERSION }}"
