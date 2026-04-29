@@ -1,41 +1,29 @@
-name: "Estrutura de Diretorios e Arquivos"
+name: Hello Github Actions
 
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
-env:
-  NODE_VERSION: "18"
-
 jobs:
-  demostrar-estrutura:
-    name: "Demonstrar Estrutura Básica"
-    runs-on: ubuntu-latest
+  hello-job:
+    runs-on: ubuntu-22.04
 
     steps:
-      - name: Checkout do Código
+      - name: Checkout Códgio
         uses: actions/checkout@v4
 
-      - name: Mostrar estrutura .github/workflow
-        run: |
-          echo " == ESTRUTURA DE DIRETÓRIOS E ARQUIVOS .github/workflows == "
-          ls -la .github/workflows
-          echo ""
-          echo "Total de workflows: $(ls -1 .github/workflows | wc -l)"
+      - name: Executar Hello Word
+        run: echo "Hello Github Actions"
 
-      - name: Elementos obrigatórios do workflow
+      - name: Mostrar informações do Sistema
         run: |
-          echo " == ELEMENTOS OBRIGATÓRIOS"
-          echo "1 - name: Nome do WorkFlow"
-          echo "2 - on: Evento que dispara o workflow"
-          echo "3 - jobs: Definição dos trabalhos a serem executados"
-          echo "4 - runs-on: Ambientes onde o job será executado"
-          echo "5 - steps: Passos individuais dentro do jobs"
-          echo ""
-          echo "Total de elementos obrigatórios 5"
+          echo "Sistema Operaciona ${{ runner.os }}"
+          echo "Diretório atual: $(pwd)"
+          echo "Data atual: $(date)}"
+          echo "SUsuário: $(whoami)"
 
-      - name: Variaveis e Contexto
-        run: |
-          echo " == Variaveis de Contexo"
-          echo "Variáveis env: ${{ env.NODE_VERSION }}"
+      - name: Listar arquivos do repositório
+        run: ls -la
