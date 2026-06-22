@@ -1,34 +1,51 @@
+name: Issue trigger workflow
+
+permissions:
+  issues: write
+
 on:
-  schedule:
-    - cron: "13 21 * * *"
-  workflow_dispatch:
+  issues:
+    types: [opened, closed, edited, labeled]
 
 jobs:
-  scheduled-job:
+  issue_trigger_job:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Informações do Schedule
-        run: |
-          echo "Este workflow foi acionado por um evento de agendamento (cron) ou manualmente (workflow_dispatch)."
-          echo "Data e hora do acionamento: $(date)"
-          echo "Evento de acionamento: ${{ github.event_name }}"
-          echo "Branch: ${{ github.ref }}"
-          echo "Repositório: ${{ github.repository }}"
-          echo "Número do workflow: ${{ github.run_number }}"
-          echo "ID do workflow: ${{ github.workflow }}"
-          echo "URL do workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-
-      - name: Relatório de execução
-        run: |
-          echo "Relatório de execução do workflow:"
-          echo "Evento: ${{ github.event_name }}"
-          echo "Data e hora: $(date)"
-          echo "Branch: ${{ github.ref }}"
-          echo "Repositório: ${{ github.repository }}"
-          echo "Número do workflow: ${{ github.run_number }}"
-          echo "ID do workflow: ${{ github.workflow }}"
-          echo "URL do workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+      - name: Log issue event
+        run: echo "Issue event triggered: ${{ github.event.action }} on issue #${{ github.event.issue.number }}"
+      - name: Add comment to issue
+        if: github.event.action == 'opened'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const issueNumber = context.payload.issue.number;
+            const commentBody = `Thank you for opening this issue! We will review it as soon as possible.`;
+            await github.issues.createComment({
+              issue_number: issueNumber,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody
+            });
+      - name: Add label to issue
+        if: github.event.action == 'opened'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const issueNumber = context.payload.issue.number;
+            const labelName = 'triage';
+            await github.issues.addLabels({
+              issue_number: issueNumber,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: [labelName]
+            });
+      - name: Log issue closed event
+        if: github.event.action == 'closed'
+        run: echo "Issue #${{ github.event.issue.number }} has been closed."
+      - name: Log issue edited event
+        if: github.event.action == 'edited'
+        run: echo "Issue #${{ github.event.issue.number }} has been edited."
+      - name: Log issue labeled event
+        if: github.event.action == 'labeled'
+        run: echo "Issue #${{ github.event.issue.number }} has been labeled with '${{ github.event.label.name }}'."
+        
