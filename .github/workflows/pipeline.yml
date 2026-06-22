@@ -12,7 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Log issue event
-        run: echo "Issue event triggered: ${{ github.event.action }} on issue #${{ github.event.issue.number }}"
+        run: | 
+          echo "Issue event triggered: ${{ github.event.action }} for issue #${{ github.event.issue.number }}."
+          
       - name: Add comment to issue
         if: github.event.action == 'opened'
         uses: actions/github-script@v6
@@ -48,4 +50,3 @@ jobs:
       - name: Log issue labeled event
         if: github.event.action == 'labeled'
         run: echo "Issue #${{ github.event.issue.number }} has been labeled with '${{ github.event.label.name }}'."
-        
